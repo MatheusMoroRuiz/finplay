@@ -22,7 +22,8 @@ model Transaction {
   paymentMethod TransactionPaymentMethod
   date          DateTime
   createdAt     DateTime                 @default(now()) //Irá mostrar a data e hora atual de quando o usuário fizer o registro
-  updatedAt     DateTime                 @updatedAt //
+  updatedAt     DateTime                 @updatedAt
+  userId       String                  
 }
 
 enum TransactionType {
