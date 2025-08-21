@@ -1,5 +1,23 @@
-const Home = () => {
-  return <h1 className="text-red-500"> Hello World</h1>;
+import { UserButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+
+const Home = async () => {
+  // Verifica se o usuário está autenticado
+  // Se não estiver autenticado, redireciona para a página de login
+  // A função auth() retorna um objeto com informações do usuário autenticado
+  // O userId é uma propriedade que indica se o usuário está autenticado
+  // Se userId for undefined, significa que o usuário não está autenticado
+  // Portanto, redirecionamos para a página de login
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/login");
+  }
+  return (
+    <div className="flex h-full items-center justify-center">
+      <UserButton showName />
+    </div>
+  );
 };
 
 export default Home;

@@ -1,8 +1,18 @@
 import Image from "next/image";
 import { Button } from "../_components/ui/button";
 import { LogInIcon } from "lucide-react";
+import { SignInButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const LoginPage = () => {
+  // Verifica se o usuário já está autenticado através do auth do Clerk
+  // Se estiver autenticado, redireciona para a página inicial
+  // A função auth() retorna um objeto com informações do usuário autenticado
+  const { userId } = auth();
+  if (userId) {
+    redirect("/");
+  }
   return (
     <div className="grid h-full grid-cols-2">
       {/* CONTEÚDO DA ESQUERDA */}
@@ -23,10 +33,12 @@ const LoginPage = () => {
           dinheiro. Mais do que controlar gastos, nós tornamos a educação
           financeira uma experiência prática, divertida e segura.
         </p>
-        <Button variant="outline">
-          <LogInIcon className="mr-2" />
-          Fazer login ou criar conta
-        </Button>
+        <SignInButton>
+          <Button variant="outline">
+            <LogInIcon className="mr-2" />
+            Fazer login ou criar conta
+          </Button>
+        </SignInButton>
       </div>
       {/* IMAGEM DA DIREITA */}
       <div className="relative h-full w-ful">
