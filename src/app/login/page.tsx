@@ -33,6 +33,7 @@ const LoginPage = () => {
           dinheiro. Mais do que controlar gastos, nós tornamos a educação
           financeira uma experiência prática, divertida e segura.
         </p>
+        {/* O SignInButton do Clerk é usado para criar um botão de login que redireciona o usuário para a página de login do Clerk */}
         <SignInButton>
           <Button variant="outline">
             <LogInIcon className="mr-2" />

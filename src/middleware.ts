@@ -1,3 +1,6 @@
+// Esse arquivo é responsável por configurar o middleware do Clerk no Next.js.
+// O middleware é usado para proteger rotas e verificar a autenticação do usuário.
+
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
 export default clerkMiddleware();
