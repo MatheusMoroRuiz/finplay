@@ -5,7 +5,30 @@
 import { Transaction, TransactionType } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/app/_components/ui/badge";
-import { CircleIcon } from "lucide-react";
+import { CircleIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { Button } from "@/app/_components/ui/button";
+
+export const TRANSACTION_CATEGORY_LABELS = {
+  EDUCATION: "Educação",
+  FOOD: "Alimentação",
+  TRANSPORTATION: "Transporte",
+  HEALTH: "Saúde",
+  HOUSING: "Moradia",
+  SALARY: "Salário",
+  UTILITY: "Utilidades",
+  ENTERTAINMENT: "Entretenimento",
+  OTHER: "Outros",
+};
+
+export const TRANSACTION_PAYMENT_METHOD_LABELS = {
+  CREDIT_CARD: "Cartão de Crédito",
+  DEBIT_CARD: "Cartão de Débito",
+  BANK_SLIP: "Boleto Bancário",
+  BANK_TRANSFER: "Transferência Bancária",
+  CASH: "Dinheiro",
+  PIX: "Pix",
+  OTHER: "Outro",
+};
 
 // A Transaction já possui os campos: id, name, type, category, paymentMethod, date, amount que puxa automaticamente do banco de dados
 export const transactionColumns: ColumnDef<Transaction>[] = [
@@ -47,21 +70,48 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "category",
     header: "Categoria",
+    cell: ({ row: { original: transaction } }) =>
+      TRANSACTION_CATEGORY_LABELS[transaction.category],
   },
   {
     accessorKey: "paymentMethod",
     header: "Método de Pagamento",
+    cell: ({ row: { original: transaction } }) =>
+      TRANSACTION_PAYMENT_METHOD_LABELS[transaction.paymentMethod],
   },
   {
     accessorKey: "date",
     header: "Data",
+    cell: ({ row: { original: transaction } }) =>
+      new Date(transaction.date).toLocaleDateString("pt-BR", {
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
+      }),
   },
   {
     accessorKey: "amount",
     header: "Valor",
+    cell: ({ row: { original: transaction } }) =>
+      new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(transaction.amount),
   },
   {
     accessorKey: "actions",
-    header: "",
+    header: "Ações",
+    cell: () => {
+      return (
+        <div className="space-x-1">
+          <Button variant="ghost" size="icon" className="text-muted-foreground">
+            <PencilIcon />
+          </Button>
+          <Button variant="ghost" size="icon" className="text-muted-foreground">
+            <TrashIcon />
+          </Button>
+        </div>
+      );
+    },
   },
 ];
