@@ -1,8 +1,7 @@
-import { ArrowDownUpIcon } from "lucide-react";
-import { Button } from "../_components/ui/button";
 import { db } from "../_lib/prisma";
 import { DataTable } from "../_components/ui/data-table";
 import { transactionColumns } from "./_columns";
+import AddTransactionButton from "../_components/add-transaction-button";
 
 const TransactionsPage = async () => {
   // O findMany serve para buscar todas as transações no banco na tabela Transaction
@@ -12,10 +11,7 @@ const TransactionsPage = async () => {
       {/* TÍTULO E BOTÃO */}
       <div className="flex w-full justify-between items-center">
         <h1 className="text-2xl font-bold">Transações</h1>
-        <Button className="rounded-full font-bold">
-          Adicionar Transação
-          <ArrowDownUpIcon />
-        </Button>
+        <AddTransactionButton />
       </div>
       {/* Aqui eu estou renderizando a tabela de transações */}
       <DataTable columns={transactionColumns} data={transactions} />

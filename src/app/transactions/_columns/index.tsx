@@ -7,28 +7,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/app/_components/ui/badge";
 import { CircleIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/app/_components/ui/button";
-
-export const TRANSACTION_CATEGORY_LABELS = {
-  EDUCATION: "Educação",
-  FOOD: "Alimentação",
-  TRANSPORTATION: "Transporte",
-  HEALTH: "Saúde",
-  HOUSING: "Moradia",
-  SALARY: "Salário",
-  UTILITY: "Utilidades",
-  ENTERTAINMENT: "Entretenimento",
-  OTHER: "Outros",
-};
-
-export const TRANSACTION_PAYMENT_METHOD_LABELS = {
-  CREDIT_CARD: "Cartão de Crédito",
-  DEBIT_CARD: "Cartão de Débito",
-  BANK_SLIP: "Boleto Bancário",
-  BANK_TRANSFER: "Transferência Bancária",
-  CASH: "Dinheiro",
-  PIX: "Pix",
-  OTHER: "Outro",
-};
+import {
+  TRANSACTION_CATEGORY_LABELS,
+  TRANSACTION_PAYMENT_METHOD_LABELS,
+} from "@/app/_constants/transactions";
 
 // A Transaction já possui os campos: id, name, type, category, paymentMethod, date, amount que puxa automaticamente do banco de dados
 export const transactionColumns: ColumnDef<Transaction>[] = [
