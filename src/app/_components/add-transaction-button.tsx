@@ -13,7 +13,7 @@ import {
   DialogClose,
 } from "./ui/dialog";
 
-import { z } from "zod";
+import { set, z } from "zod";
 import { TransactionType } from "@prisma/client";
 import { TransactionCategory } from "@prisma/client";
 import { TransactionPaymentMethod } from "@prisma/client";
@@ -38,18 +38,20 @@ import {
 } from "./ui/select";
 import {
   TRANSACTION_CATEGORY_OPTIONS,
-  TRANSACTION_PAYMENT_METHOD_LABELS,
   TRANSACTION_PAYMENT_METHOD_OPTIONS,
   TRANSACTION_TYPE_OPTIONS,
 } from "../_constants/transactions";
 import { DatePicker } from "./ui/date-picker";
+import { addTransaction } from "../_actions/add-transaction";
+import { NumberFormatValues } from "react-number-format";
+import { useState } from "react";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, {
     message: "O nome é obrigatório.",
   }),
-  amount: z.string().trim().min(1, {
-    message: "O valor é obrigatório.",
+  amount: z.number().min(0, {
+    message: "O valor deve ser um número positivo.",
   }),
   type: z.nativeEnum(TransactionType, {
     message: "O tipo é obrigatório.",
@@ -68,11 +70,12 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 const AddTransactionButton = () => {
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      amount: "",
+      amount: 0,
       type: TransactionType.EXPENSE,
       category: TransactionCategory.OTHER,
       paymentMethod: TransactionPaymentMethod.CASH,
@@ -80,11 +83,25 @@ const AddTransactionButton = () => {
     },
   });
 
-  const onSubmit = (data: FormSchema) => {
-    console.log(data);
+  const onSubmit = async (data: FormSchema) => {
+    try {
+      await addTransaction(data);
+      setDialogIsOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+    }
   };
   return (
-    <Dialog onOpenChange={(open) => !open && form.reset()}>
+    <Dialog
+      open={dialogIsOpen}
+      onOpenChange={(open) => {
+        setDialogIsOpen(open);
+        if (!open) {
+          form.reset(); // Reseta o formulário ao fechar o diálogo
+        }
+      }}
+    >
       {/* O asChild serve para que o botão seja estilizado como um gatilho para o diálogo */}
       <DialogTrigger asChild>
         <Button className="rounded-full font-bold">
@@ -121,7 +138,15 @@ const AddTransactionButton = () => {
                 <FormItem>
                   <FormLabel>Valor</FormLabel>
                   <FormControl>
-                    <MoneyInput placeholder="Valor da transação" {...field} />
+                    <MoneyInput
+                      value={field.value ?? null}
+                      onValueChange={(v: NumberFormatValues) => {
+                        // quando vazio, manda null (não string)
+                        field.onChange(v.floatValue ?? null);
+                      }}
+                      onBlur={field.onBlur}
+                      disabled={field.disabled}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
