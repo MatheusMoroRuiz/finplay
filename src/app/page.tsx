@@ -1,6 +1,7 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Navbar from "./_components/navbar";
 
 // Uma função assíncrona serve para lidar com operações que podem levar algum tempo, como chamadas de API ou consultas ao banco de dados.
 // Neste caso, estamos usando auth() para verificar se o usuário está autenticado.
@@ -16,10 +17,10 @@ const Home = async () => {
     redirect("/login");
   }
   return (
-    <div className="flex h-full items-center justify-center">
-      {/* O UserButton do Clerk exibe informações do usuário autenticado */}
-      <UserButton showName />
-    </div>
+    <>
+      <Navbar />
+      <div className="flex h-full items-center justify-center"></div>
+    </>
   );
 };
 
