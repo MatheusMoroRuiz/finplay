@@ -11,7 +11,7 @@ export const createStripeCheckout = async () => {
   if (!process.env.STRIPE_SECRET_KEY) {
     throw new Error("Stripe secret key not found");
   }
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2024-10-28.acacia",
   });
   const session = await stripe.checkout.sessions.create({
