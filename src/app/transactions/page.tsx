@@ -6,6 +6,7 @@ import Navbar from "../_components/navbar";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { ScrollArea } from "../_components/ui/scroll-area";
+import { canUserAddTransaction } from "../_data/get-dashboard/can-user-add-transaction";
 
 const TransactionsPage = async () => {
   // Verifica se o usuário está autenticado usando Clerk e redireciona para a página de login se não estiver
@@ -22,6 +23,7 @@ const TransactionsPage = async () => {
       date: "desc", // Ordena as transações pela data em ordem decrescente
     },
   });
+  const userCanAddTransaction = await canUserAddTransaction();
   return (
     <>
       <Navbar />
@@ -29,7 +31,7 @@ const TransactionsPage = async () => {
         {/* TÍTULO E BOTÃO */}
         <div className="flex w-full justify-between items-center">
           <h1 className="text-2xl font-bold">Transações</h1>
-          <AddTransactionButton />
+          <AddTransactionButton userCanAddTransaction={userCanAddTransaction} />
         </div>
         {/* Aqui eu estou renderizando a tabela de transações */}
         <ScrollArea>
