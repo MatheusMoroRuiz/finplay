@@ -1,7 +1,7 @@
 // A pasta (home) entre parênteses indica que essa é a rota raiz do aplicativo. Pois quando o Next.js encontra uma pasta com parênteses, ele não usa como rota na URL, usa o nome do arquivo que está dentro dela.
 // O arquivo page.tsx dentro dessa pasta define o componente que será renderizado quando o usuário acessar a rota raiz do aplicativo.
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Navbar from "../_components/navbar";
 import SummaryCards from "./_components/summary-cards";
@@ -12,6 +12,7 @@ import { getDashboard } from "../_data/get-dashboard";
 import ExpensesPerCategory from "./_components/expenses-per-category";
 import LastTransactions from "./_components/last-transactions";
 import { canUserAddTransaction } from "../_data/get-dashboard/can-user-add-transaction";
+import AiReportButton from "./_components/ai-report-button";
 
 interface HomeProps {
   searchParams: {
@@ -37,13 +38,22 @@ const Home = async ({ searchParams: { month } }: HomeProps) => {
   }
   const dashboard = await getDashboard(month);
   const userCanAddTransaction = await canUserAddTransaction();
+  const user = await clerkClient().users.getUser(userId);
   return (
     <>
       <Navbar />
       <div className=" flex flex-col overflow-hidden p-6 space-y-6">
         <div className="flex justify-between">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <TimeSelect />
+          <div className="flex items-center gap-3">
+            <AiReportButton
+              month={month}
+              hasPremiumPlan={
+                user.publicMetadata.subscriptionPlan === "premium"
+              }
+            />
+            <TimeSelect />
+          </div>
         </div>
         <div className="grid grid-cols-[2fr,1fr] gap-6 overflow-hidden">
           <div className="flex flex-col gap-6 overflow-hidden">
