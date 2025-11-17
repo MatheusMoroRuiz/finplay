@@ -116,27 +116,6 @@ export default function UpsertGoalDialog({
               )}
             />
 
-            {/* PROGRESSO ATUAL */}
-            <FormField
-              control={form.control}
-              name="current"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Progresso atual</FormLabel>
-                  <FormControl>
-                    <MoneyInput
-                      value={field.value}
-                      onValueChange={({ floatValue }) =>
-                        field.onChange(floatValue)
-                      }
-                      onBlur={field.onBlur}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* DESCRIÇÃO */}
             <FormField
               control={form.control}

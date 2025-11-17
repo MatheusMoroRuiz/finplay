@@ -13,6 +13,7 @@ import ExpensesPerCategory from "./_components/expenses-per-category";
 import LastTransactions from "./_components/last-transactions";
 import { canUserAddTransaction } from "../_data/get-dashboard/can-user-add-transaction";
 import AiReportButton from "./_components/ai-report-button";
+import FloatingChatButton from "../_components/ai-chat/FloatingChatButton";
 
 interface HomeProps {
   searchParams: {
@@ -97,6 +98,10 @@ const Home = async ({ searchParams: { month } }: HomeProps) => {
           </div>
           <LastTransactions lastTransactions={dashboard.lastTransactions} />
         </div>
+        <FloatingChatButton
+          hasPremiumPlan={user.publicMetadata.subscriptionPlan === "premium"}
+          userName={user.firstName || "Usuário"}
+        />
       </div>
     </>
   );
