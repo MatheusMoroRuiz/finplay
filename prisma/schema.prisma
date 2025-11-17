@@ -78,6 +78,9 @@ model QuizQuestion {
   optionC   String
   correct   String   // "A" | "B" | "C"
   createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  quizAnswers QuizAnswer[]   // 👈 RELAÇÃO QUE ESTÁ FALTANDO
 }
 
 model QuizAnswer {
@@ -87,6 +90,8 @@ model QuizAnswer {
   chosen    String   // <-- ADICIONE ESTA LINHA
   correct   Boolean
   createdAt DateTime @default(now())
+
+  question QuizQuestion @relation(fields: [questionId], references: [id])
 }
 
 

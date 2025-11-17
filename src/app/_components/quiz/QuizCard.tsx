@@ -1,14 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { answerQuiz } from "@/app/_actions/quiz/answer-quiz";
 
-export default function QuizCard({ question, remaining }) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [status, setStatus] = useState<
-    "idle" | "correct" | "wrong" | "loading"
-  >("idle");
+export default function QuizCard({ question }) {
+  const [selected, setSelected] = useState(null);
+  const [status, setStatus] = useState("idle");
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  // calcula tempo restante
+  useEffect(() => {
+    const expires = new Date(question.expiresAt).getTime();
+
+    function update() {
+      const now = Date.now();
+      const diff = Math.max(0, Math.floor((expires - now) / 1000));
+
+      setTimeLeft(diff);
+
+      if (diff <= 0) {
+        setStatus("expired");
+      }
+    }
+
+    update();
+    const interval = setInterval(update, 1000);
+
+    return () => clearInterval(interval);
+  }, [question.expiresAt]);
+
+  function formatTimer(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }
 
   async function submit() {
     if (!selected) return;
@@ -16,22 +42,22 @@ export default function QuizCard({ question, remaining }) {
 
     const res = await answerQuiz(question.id, selected);
 
-    if (res.correct) {
-      setStatus("correct");
-    } else {
-      setStatus("wrong");
-    }
-
-    // 🔥 Evita responder 2x — recarrega a página após 1.5s
-    setTimeout(() => {
-      window.location.reload();
-    }, 1500);
+    setStatus(res.correct ? "correct" : "wrong");
   }
-
-  const isAnswered = status === "correct" || status === "wrong";
 
   return (
     <div className="p-6 border rounded-xl bg-card shadow-sm space-y-6">
+      {/* TIMER */}
+      {status !== "expired" ? (
+        <p className="text-sm text-center text-muted-foreground">
+          Expira em: <span className="font-bold">{formatTimer(timeLeft)}</span>
+        </p>
+      ) : (
+        <p className="text-red-500 text-center font-semibold">
+          ❌ Tempo esgotado!
+        </p>
+      )}
+
       <h2 className="text-xl font-semibold">{question.question}</h2>
 
       {/* ALTERNATIVAS */}
@@ -39,16 +65,14 @@ export default function QuizCard({ question, remaining }) {
         {["A", "B", "C"].map((opt) => (
           <button
             key={opt}
-            disabled={isAnswered} // 🔒 bloqueia após resposta
+            disabled={status !== "idle" && status !== "loading"}
             onClick={() => setSelected(opt)}
-            className={`
-              w-full text-left p-3 rounded-lg border transition-all
+            className={`w-full text-left p-3 rounded-lg border transition-all
               ${
                 selected === opt
                   ? "border-primary bg-primary/10"
                   : "border-muted"
               }
-              ${isAnswered ? "opacity-50 cursor-not-allowed" : ""}
             `}
           >
             {opt === "A" && question.optionA}
@@ -58,25 +82,23 @@ export default function QuizCard({ question, remaining }) {
         ))}
       </div>
 
-      {/* FEEDBACK */}
+      {/* STATUS */}
       {status === "correct" && (
-        <p className="text-green-500 font-medium">
+        <p className="text-green-500 font-medium text-center">
           ✔ Resposta correta! Você ganhou XP 🎉
         </p>
       )}
 
       {status === "wrong" && (
-        <p className="text-red-500 font-medium">
-          ✖ Resposta errada… tente novamente amanhã!
+        <p className="text-red-500 font-medium text-center">
+          ✖ Resposta errada!
         </p>
       )}
 
-      {/* BOTÃO RESPONDER */}
-      {!isAnswered && (
-        <Button disabled={!selected || status === "loading"} onClick={submit}>
-          {status === "loading"
-            ? "Enviando..."
-            : `Responder (${remaining - 1} restantes)`}
+      {/* BOTÃO */}
+      {status === "idle" && (
+        <Button disabled={!selected} onClick={submit}>
+          Responder
         </Button>
       )}
     </div>

@@ -2,73 +2,70 @@ import Navbar from "../_components/navbar";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "../_lib/prisma";
 import QuizCard from "../_components/quiz/QuizCard";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "../_components/ui/button";
 
 export default async function QuizPage() {
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  if (!userId) redirect("/login");
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  // respostas de hoje
-  const answersToday = await db.quizAnswer.findMany({
-    where: {
-      userId,
-      createdAt: { gte: today },
-    },
-  });
-
-  const limit = 2;
-  const remaining = limit - answersToday.length;
-
-  if (remaining <= 0) {
-    return (
-      <>
-        <Navbar />
-
-        <div className="p-10 max-w-xl mx-auto text-center space-y-4">
-          <h1 className="text-3xl font-bold">Quiz do Dia</h1>
-          <p className="text-muted-foreground">
-            Você já respondeu todas as perguntas de hoje! Volte amanhã para
-            ganhar mais XP.
-          </p>
-        </div>
-      </>
-    );
-  }
-
-  // pegar perguntas que o usuário ainda não respondeu
-  const answeredIds = answersToday.map((a) => a.questionId);
+  const now = new Date();
 
   const question = await db.quizQuestion.findFirst({
     where: {
-      id: { notIn: answeredIds },
+      expiresAt: { gt: now },
+      quizAnswers: {
+        none: { userId },
+      },
     },
+    orderBy: { createdAt: "desc" },
   });
-
-  if (!question) {
-    return (
-      <>
-        <Navbar />
-        <div className="p-10 max-w-xl mx-auto text-center space-y-4">
-          <h1 className="text-3xl font-bold">Quiz do Dia</h1>
-          <p className="text-muted-foreground">
-            Não há mais perguntas disponíveis. Adicione novas perguntas no
-            painel admin.
-          </p>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
       <Navbar />
 
       <div className="p-10 max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Quiz do Dia</h1>
+        {/* HEADER MODERNO */}
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight">Quiz</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Teste seus conhecimentos e ganhe XP!
+            </p>
+          </div>
 
-        <QuizCard question={question} remaining={remaining} />
+          <Link href="/quiz/historico">
+            <Button
+              variant="outline"
+              className="
+                border-primary/20 
+                hover:bg-primary/10 
+                transition 
+                text-primary
+                rounded-lg
+              "
+            >
+              📘 Histórico
+            </Button>
+          </Link>
+        </div>
+
+        {/* CONTEÚDO */}
+        {!question ? (
+          <div className="text-center p-10 bg-card border border-muted rounded-xl shadow-sm">
+            <p className="text-muted-foreground text-lg">
+              Nenhuma pergunta ativa no momento.
+              <br />
+              <span className="text-primary font-medium">
+                Aguarde o próximo lançamento! ⏳
+              </span>
+            </p>
+          </div>
+        ) : (
+          <QuizCard question={question} />
+        )}
       </div>
     </>
   );
