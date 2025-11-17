@@ -7,36 +7,33 @@ import { redirect } from "next/navigation";
 
 export default async function QuizAdminPage() {
   const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
 
+  // 🔥 Nunca use throw em Server Components na Vercel
   if (!userId) {
     redirect("/login");
   }
 
+  // 🔥 Proteção real de administrador
   const admin = await isAdmin();
   if (!admin) {
     return (
-      <div className="p-10 text-center">
-        <h1 className="text-2xl font-bold">Acesso negado</h1>
-        <p className="text-muted-foreground mt-2">
-          Esta área é restrita a administradores.
-        </p>
-      </div>
+      <>
+        <Navbar />
+        <div className="p-10 text-center">
+          <h1 className="text-2xl font-bold">Acesso negado</h1>
+          <p className="text-muted-foreground mt-2">
+            Esta área é restrita a administradores.
+          </p>
+        </div>
+      </>
     );
   }
 
+  // 🔥 Consulta corrigida (seu model NÃO tem quizAnswers)
   const questions = await db.quizQuestion.findMany({
-    where: {
-      NOT: {
-        quizAnswers: {
-          some: {
-            userId,
-          },
-        },
-      },
-    },
     orderBy: { createdAt: "desc" },
   });
+
   return (
     <>
       <Navbar />
