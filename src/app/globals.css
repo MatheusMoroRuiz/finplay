@@ -66,6 +66,27 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  .xp-animated {
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glow-gold {
+  position: relative;
+  animation: glow-pulse 2s infinite ease-in-out;
+  border: 2px solid #facc15 !important; /* amarelo dourado */
+}
+
+@keyframes glow-pulse {
+  0% {
+    box-shadow: 0 0 8px #facc15;
+  }
+  50% {
+    box-shadow: 0 0 18px #facc15;
+  }
+  100% {
+    box-shadow: 0 0 8px #facc15;
+  }
+}
 }
 
 @layer base {

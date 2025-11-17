@@ -26,6 +26,72 @@ model Transaction {
   userId       String                  
 }
 
+model Goal {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  amount      Float
+  current     Float    @default(0)
+  description String
+  deadline    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Achievement {
+  id        String   @id @default(cuid())
+  userId    String
+  goalId    String?
+  title     String
+  icon      String   // “star”, “trophy”, “medal”, etc.
+  points    Int      @default(50)
+  createdAt DateTime @default(now())
+}
+
+model UserProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique // Clerk ID
+
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  totalXp       Int      @default(0)
+  lastLogin     DateTime @default(now())
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model UserXp {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuizQuestion {
+  id        String   @id @default(cuid())
+  question  String
+  optionA   String
+  optionB   String
+  optionC   String
+  correct   String   // "A" | "B" | "C"
+  createdAt DateTime @default(now())
+}
+
+model QuizAnswer {
+  id        String   @id @default(cuid())
+  userId    String
+  questionId String
+  chosen    String   // <-- ADICIONE ESTA LINHA
+  correct   Boolean
+  createdAt DateTime @default(now())
+}
+
+
+
+
 enum TransactionType {
   DEPOSIT
   EXPENSE
